@@ -13,3 +13,11 @@ class UserLoginSerializer(serializers.ModelSerializer):
         model = User
         fields = ['email', 'password']
         extra_kwargs = {'password': {'write_only': True}}
+
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    new_password = serializers.CharField(write_only=True)
+    new_password_confirmation = serializers.CharField(write_only=True)
+
