@@ -1,17 +1,16 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
-from .models import Note
+from .models import Note, Category, CustomUser
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = CustomUser
         fields = ['email', 'first_name', 'last_name', 'password']
         extra_kwargs = {'password': {'write_only': True}}
 
 class UserLoginSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = User
+        model = CustomUser
         fields = ['email', 'password']
         extra_kwargs = {'password': {'write_only': True}}
 
@@ -26,3 +25,8 @@ class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
         fields = ['title', 'content', 'due_date', 'priority']
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'

@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
@@ -16,11 +15,11 @@ from django.utils import timezone
 import csv
 from django.http import HttpResponse
 from reportlab.pdfgen import canvas
-from djangocsv import render_to_csv_repsonse
+#from djangocsv import render_to_csv_repsonse
 
 
 class UserRegistrationView(generics.CreateAPIView):
-    queryset = User.objects.all()
+    queryset = models.CustomUser.objects.all()
     serializer_class = serializers.UserRegistrationSerializer
 
     def create(self, request, *args, **kwargs):
@@ -30,7 +29,7 @@ class UserRegistrationView(generics.CreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class UserLoginView(generics.CreateAPIView):
-    queryset = User.objects.all()
+    queryset = models.CustomUser.objects.all()
     serializer_class = serializers.UserLoginSerializer
 
     def post(self, request, *args, **kwargs):
@@ -40,7 +39,7 @@ class UserLoginView(generics.CreateAPIView):
         user = None
         if '@' in email:
             try:
-                user = User.objects.get(email=email)
+                user = models.CustomUser.objects.get(email=email)
             except ObjectDoesNotExist:
                 return Response({'error': 'User does not exist!'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -147,7 +146,7 @@ class NoteDeleteView(generics.DestroyAPIView):
     #permission_class = [permissions.is_authenticated, IsOwner]2
 
 class LatestNotesView(generics.ListAPIView):
-    queryset = models.Note.objects.all().order_by('-created_time')
+    queryset = models.Note.objects.all().order_by('created_time')
     serializer_class = serializers.NoteSerializer
     #permission_class = [permissions.IsAuthenticated]
 
@@ -187,9 +186,26 @@ class SortedNotesView(generics.ListAPIView):
 
         return queryset
 
+
 class ExportNotesView(APIView):
     permission_classes = [permissions.IsAuthenticated]  # Add authentication and permissions as needed
 
+    def post(self, request):
+        # Retrieve all notes
+        notes = models.Note.objects.all()
+        serializer = serializers.NoteSerializer(notes, many=True)
+
+        # Generate CSV
+        data = [[note['title'], note['content'], note['due_date'], note['priority'], note['created_time']] for note in serializer.data]
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="notes.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow(["Title", "Content", "Due Date", "Priority", "Created Time"])
+        writer.writerows(data)
+
+        return response
+"""
     def get(self, request):
         # Retrieve all notes
         notes = models.Note.objects.all()
@@ -219,22 +235,7 @@ class ExportNotesView(APIView):
         p.save()
 
         return response
-
-    def post(self, request):
-        # Retrieve all notes
-        notes = models.Note.objects.all()
-        serializer = serializers.NoteSerializer(notes, many=True)
-
-        # Generate CSV
-        data = [[note['title'], note['content'], note['due_date'], note['priority'], note['created_time']] for note in serializer.data]
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="notes.csv"'
-
-        writer = csv.writer(response)
-        writer.writerow(["Title", "Content", "Due Date", "Priority", "Created Time"])
-        writer.writerows(data)
-
-        return response
+"""
 
 class ShareNotesView(APIView):
     permission_classes = [permissions.IsAuthenticated]  # Add authentication and permissions as needed

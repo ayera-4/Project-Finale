@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'diarynotes',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -137,3 +138,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'your-email@example.com'
 EMAIL_HOST_PASSWORD = 'your-email-password'
+
+SWAGGER_SETTINGS = {
+    'DEFAULT_INFO': 'diarynotes.urls.api_info',
+}
