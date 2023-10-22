@@ -1,12 +1,12 @@
 from django.urls import path
-from . import views
+from . import views, user_views
 
 urlpatterns = [
-    path('register/', views.UserRegistrationView.as_view(), name="user-registration"),
-    path('login/', views.UserLoginView.as_view(), name="user-login"),
-    path('logout/', views.UserLogoutView.as_view(), name="user-logout"),
-    path('password-reset/', views.PasswordResetRequestView.as_view(), name='password-reset'),
-    path('password-reset/confirm/<str:uidb64>/<str:token>/', views.PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
+    path('register/', user_views.UserRegistrationView.as_view(), name="user-registration"),
+    path('login/', user_views.UserLoginView.as_view(), name="user-login"),
+    path('logout/', user_views.UserLogoutView.as_view(), name="user-logout"),
+    path('password-reset/', user_views.PasswordResetRequestView.as_view(), name='password-reset'),
+    path('password-reset/confirm/<str:uidb64>/<str:token>/', user_views.PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
 
     path('note-add/', views.NoteAddView.as_view(), name='note-add'),
     path('note-list/', views.NoteListView.as_view(), name='note-list'),

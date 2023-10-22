@@ -24,7 +24,7 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
-        fields = ['title', 'content', 'due_date', 'priority']
+        fields = ['title', 'content', 'due_date', 'priority', 'category', 'user']
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
