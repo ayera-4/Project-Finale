@@ -14,7 +14,7 @@ Installation Steps:
 
 2. Navigate to the Project Directory:
 
-   cd diarynotes
+   cd notes_ap
 
 3. Install Python Dependencies:
 
@@ -31,13 +31,27 @@ Installation Steps:
 
    python manage.py createsuperuser
 
-6. Run the Development Server:
+6. Set up a valid email configuration for email dependent endpoints
+
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'your-smtp-server.com'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = 'your-email@example.com'
+    EMAIL_HOST_PASSWORD = 'your-email-password'
+
+
+7. Run the Development Server:
 
    python manage.py runserver
 
-
    Your application will now be running on `http://localhost:8000/`.
    You can access the Django admin interface at `http://localhost:8000/admin/` and use the superuser credentials you created in step 5.
+
+8. List of API Endpoints:
+
+    Run http://127.0.0.1:8000/user/user-view/ to view user related
+    Run http://127.0.0.1:8000/user/notes-view/ to view notes related
 
 7. Access the API Endpoints:
    You can access the API endpoints using tools like [Postman](https://www.postman.com/) or [curl](https://curl.se/).

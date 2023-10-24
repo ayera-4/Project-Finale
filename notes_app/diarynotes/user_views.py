@@ -10,6 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
+from django.utils import timezone
 
 
 class UserRegistrationView(generics.CreateAPIView):
@@ -62,6 +63,20 @@ class UserLogoutView(APIView):
         return Response({'error': 'No token detected'}, status=status.HTTP_404_NOT_FOUND)
 
 
+class TokenExpirationView(APIView):
+    def get(self, request):
+        # Check if the user is authenticated and has a token
+        if request.user.is_authenticated and hasattr(request.user, 'auth_token'):
+            token = request.user.auth_token
+            current_time = timezone.now()
+            token_expires = token.created + token.settings.DEFAULT_EXPIRATION
+            token_valid = current_time <= token_expires
+
+            return Response({"valid": token_valid})
+        else:
+            return Response({"valid": False})
+
+
 class PasswordResetRequestView(APIView):
     serializer_class = serializers.PasswordResetSerializer
 
@@ -105,3 +120,35 @@ class PasswordResetConfirmView(APIView):
                 return Response({'message': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
         except (TypeError, ValueError, OverflowError, get_user_model().DoesNotExist):
             return Response({'message': 'Invalid user or token'}, status=status.HTTP_400_BAD_REQUEST)
+
+class NotesApiView(APIView):
+    def get(self, request):
+        api_urls = {
+            'Create a note': 'note-add/',
+            'View list of notes': 'note-list/',
+            'View a note': 'note-detail/<str:pk>/',
+            'Update a note': 'note-update/<str:pk>/',
+            'Delete a note': 'note-delete/<str:pk>/',
+            'View latest notes': 'notes-latest/',
+            'View unfinished notes': 'notes-unfinished/',
+            'View overdue notes': 'notes-overdue/',
+            'View sorted notes': 'notes-sorted/',
+            'Share notes on email': 'notes-share/',
+            'Set reminder for note': 'set-reminder/<str:note_id>/',
+            'Export notes as PDF': 'export/pdf/',
+            'Export notes as CSV': 'export/csv/',
+        }
+        return Response(api_urls)
+
+class UserApiView(APIView):
+    def get(self, request):
+        api_urls = {
+            'Register User': 'register/',
+            'login User': 'login/',
+            'logout User': 'logout/',
+            'token expiration check': 'token-expiration/',
+            'password reset': 'password-reset/',
+            'confirm password reset': 'password-reset/confirm/<str:uidb64>/<str:token>/',
+
+        }
+        return Response(api_urls)

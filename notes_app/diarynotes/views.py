@@ -62,7 +62,7 @@ class SortedNotesView(generics.ListAPIView):
     serializer_class = serializers.NoteSerializer
     #permission_classes = [permissions.IsAuthenticated]
 
-    
+
 class ExportNotesView(generics.ListAPIView):
     # permission_classes = [permissions.IsAuthenticated]
 
