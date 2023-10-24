@@ -15,72 +15,56 @@ from reportlab.pdfgen import canvas
 class NoteAddView(generics.CreateAPIView):
     queryset = models.Note.objects.all()
     serializer_class = serializers.NoteSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    #permission_classes = [permissions.IsAuthenticated]
 
 class NoteListView(generics.ListAPIView):
     queryset = models.Note.objects.all()
     serializer_class = serializers.NoteSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    #permission_classes = [permissions.IsAuthenticated]
 
 class NoteDetailView(generics.RetrieveAPIView):
     queryset = models.Note.objects.all()
     serializer_class = serializers.NoteSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    #permission_classes = [permissions.IsAuthenticated]
 
 class NoteUpdateView(generics.UpdateAPIView):
     queryset = models.Note.objects.all()
     serializer_class = serializers.NoteSerializer
-    permission_class = [permissions.IsAuthenticated, IsOwner]
+    #permission_class = [permissions.IsAuthenticated, IsOwner]
 
 class NoteDeleteView(generics.DestroyAPIView):
     queryset = models.Note.objects.all()
     serializer_class = serializers.NoteSerializer
-    permission_class = [permissions.IsAuthenticated, IsOwner]
+    #permission_class = [permissions.IsAuthenticated, IsOwner]
 
 class LatestNotesView(generics.ListAPIView):
     queryset = models.Note.objects.all().order_by('-created_time')
     serializer_class = serializers.NoteSerializer
-    permission_class = [permissions.IsAuthenticated]
+    #permission_class = [permissions.IsAuthenticated]
 
 class UnfinishedNotesView(generics.ListAPIView):
     queryset = models.Note.objects.filter(unfinished=True)
     serializer_class = serializers.NoteSerializer
-    permission_class = [permissions.IsAuthenticated]
+    #permission_class = [permissions.IsAuthenticated]
 
 class OverdueNotesView(generics.ListAPIView):
     queryset = models.Note.objects.filter(overdue=True)
     serializer_class = serializers.NoteSerializer
-    permission_class = [permissions.IsAuthenticated]
+    #permission_class = [permissions.IsAuthenticated]
 
 class DoneNotesView(generics.ListAPIView):
-    queryset = models.Note.objects.filter(done=True)
+    queryset = models.Note.objects.filter(overdue=True)
     serializer_class = serializers.NoteSerializer
-    permission_class = [permissions.IsAuthenticated]
+    #permission_class = [permissions.IsAuthenticated]
 
 class SortedNotesView(generics.ListAPIView):
     queryset = models.Note.objects.all()
     serializer_class = serializers.NoteSerializer
-    permission_class = [permissions.IsAuthenticated]
+    #permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-
-        sort_by = self.request.query_params.get('sort_by', None)
-
-        if sort_by == 'due_date':
-            queryset = queryset.order_by('due_date')
-        elif sort_by == 'priority':
-            queryset = queryset.order_by('priority')
-        elif sort_by == 'created_time':
-            queryset = queryset.order_by('created_time')
-        else:
-            queryset = queryset.oredr_by('created_time')
-
-        return queryset
-
-
-class ExportNotesView(APIView):
-    permission_classes = [permissions.IsAuthenticated]  # Add authentication and permissions as needed
+    
+class ExportNotesView(generics.ListAPIView):
+    # permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         # Retrieve all notes
@@ -130,7 +114,7 @@ class ExportNotesView(APIView):
 """
 
 class ShareNotesView(APIView):
-    permission_classes = [permissions.IsAuthenticated]  # Add authentication and permissions as needed
+    #permission_classes = [permissions.IsAuthenticated]  # Add authentication and permissions as needed
 
     def post(self, request):
         # Retrieve all notes
@@ -155,7 +139,7 @@ class ShareNotesView(APIView):
         return Response({"message": "Notes shared via email."})
 
 class SetReminderView(APIView):
-    permission_classes = [permissions.IsAuthenticated]  # Add authentication and permissions as needed
+    #permission_classes = [permissions.IsAuthenticated]  # Add authentication and permissions as needed
 
     def post(self, request, note_id):
         try:

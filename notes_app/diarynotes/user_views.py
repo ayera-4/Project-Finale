@@ -31,7 +31,7 @@ class UserLoginView(generics.CreateAPIView):
         email = data.get('email')
         password = data.get('password')
         user = None
-        if '@' in email:
+        if '@' in str(email):
             try:
                 user = models.CustomUser.objects.get(email=email)
             except ObjectDoesNotExist:
@@ -48,18 +48,10 @@ class UserLoginView(generics.CreateAPIView):
 
 
 class UserLogoutView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    #permission_classes = [permissions.IsAuthenticated]
     def post(self, request, *args, **kwargs):
         #Get the user's token
         token, _ = Token.objects.get_or_create(user=request.user)
-        #token, _ = Token.objects.get_or_create(user=request.data)
-        try:
-            token.delete()
-            return Response({'message': 'Successfully logged out.'}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        """
         if token:
             try:
                 # Expire the token
@@ -68,7 +60,6 @@ class UserLogoutView(APIView):
             except Exception as e:
                 return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response({'error': 'No token detected'}, status=status.HTTP_404_NOT_FOUND)
-        """
 
 
 class PasswordResetRequestView(APIView):
