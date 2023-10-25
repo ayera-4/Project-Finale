@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -6,10 +5,6 @@ from . import serializers, models
 from . permissions import IsOwner
 from django.core.mail import send_mail
 from django.utils import timezone
-import csv
-from django.http import HttpResponse
-from reportlab.pdfgen import canvas
-#from djangocsv import render_to_csv_repsonse
 
 class NoteCategoryView(generics.CreateAPIView):
     queryset = models.CustomUser.objects.all()
@@ -74,8 +69,8 @@ class SortedNotesView(generics.ListAPIView):
     def get_queryset(self):
         queryset = super().get_queryset()
 
-        # Get sorting criteria from query parameters
-        sort_by = self.request.query_params.get('sort_by', None)
+        # Get sorting criteria from query parameters, with created_time the default
+        sort_by = self.request.query_params.get('sort_by', 'created_time')
 
         # Sort notes based on criteria
         if sort_by == 'due_date':
@@ -84,62 +79,9 @@ class SortedNotesView(generics.ListAPIView):
             queryset = queryset.order_by('priority')
         elif sort_by == 'created_time':
             queryset = queryset.order_by('created_time')
-        else:
-            # By default, sort by created_time
-            queryset = queryset.order_by('created_time')
 
         return queryset
 
-
-class ExportNotesView(generics.ListAPIView):
-    # permission_classes = [permissions.IsAuthenticated]
-
-    def post(self, request):
-        # Retrieve all notes
-        notes = models.Note.objects.all()
-        serializer = serializers.NoteSerializer(notes, many=True)
-
-        # Generate CSV
-        data = [[note['title'], note['content'], note['due_date'], note['priority'], note['created_time']] for note in serializer.data]
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="notes.csv"'
-
-        writer = csv.writer(response)
-        writer.writerow(["Title", "Content", "Due Date", "Priority", "Created Time"])
-        writer.writerows(data)
-
-        return response
-"""
-    def get(self, request):
-        # Retrieve all notes
-        notes = models.Note.objects.all()
-        serializer = serializers.NoteSerializer(notes, many=True)
-
-        # Generate PDF
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="notes.pdf"'
-
-        p = canvas.Canvas(response)
-        p.drawString(100, 800, "List of Notes")
-        data = [[note['title'], note['content'], note['due_date'], note['priority'], note['created_time']] for note in serializer.data]
-        width, height = A4
-        table = Table(data, colWidths=1.8 * inch, rowHeights=0.4 * inch)
-        table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black)
-        ]))
-        table.wrapOn(p, width, height)
-        table.drawOn(p, 10, 650)
-        p.showPage()
-        p.save()
-
-        return response
-"""
 
 class ShareNotesView(APIView):
     #permission_classes = [permissions.IsAuthenticated]  # Add authentication and permissions as needed
@@ -159,10 +101,10 @@ class ShareNotesView(APIView):
             message += f"Priority: {note['priority']}\n"
             message += f"Created Time: {note['created_time']}\n\n"
 
-        recipient_email = request.data.get("recipient_email")
+        recipient_email = request.data.get("gumanyarevan@gmail.com")
 
         # Send the email
-        send_mail(subject, message, 'your_email@example.com', [recipient_email])
+        send_mail(subject, message, 'myuo4test@gmail.com', [recipient_email])
 
         return Response({"message": "Notes shared via email."})
 

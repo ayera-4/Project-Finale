@@ -50,7 +50,7 @@ class UserLoginView(generics.CreateAPIView):
 
 class UserLogoutView(APIView):
     #permission_classes = [permissions.IsAuthenticated]
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         #Get the user's token
         token, _ = Token.objects.get_or_create(user=request.user)
         if token:
@@ -138,6 +138,7 @@ class NotesApiView(APIView):
             'Set reminder for note': 'set-reminder/<str:note_id>/',
             'Export notes as PDF': 'export/pdf/',
             'Export notes as CSV': 'export/csv/',
+            'Export notes as Excel': 'export/excel/',
         }
         return Response(api_urls)
 

@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from . import views, note_export_views
 
 urlpatterns = [
     path('category-add/', views.NoteCategoryView.as_view(), name='category-add'),
@@ -13,8 +13,9 @@ urlpatterns = [
     path('notes-overdue/', views.OverdueNotesView.as_view(), name='notes-overdue'),
     path('notes-done/', views.DoneNotesView.as_view(), name='notes-done'),
     path('notes-sorted/', views.SortedNotesView.as_view(), name='notes-sorted'),
-    path('export/pdf/', views.ExportNotesView.as_view(), name='export-notes-pdf'),
-    path('export/csv/', views.ExportNotesView.as_view(), name='export-notes-csv'),
+    path('export/pdf/', note_export_views.ExportPDFView.as_view(), name='export-notes-pdf'),
+    path('export/csv/', note_export_views.ExportCSVView.as_view(), name='export-notes-csv'),
+    path('export/excel/', note_export_views.ExportExcelView.as_view(), name='export-notes-excel'),
     path('notes-share/', views.ShareNotesView.as_view(), name='share-notes'),
     path('set-reminder/<int:note_id>/', views.SetReminderView.as_view(), name='set-reminder'),
 
