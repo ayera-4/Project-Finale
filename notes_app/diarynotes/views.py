@@ -11,6 +11,14 @@ from django.http import HttpResponse
 from reportlab.pdfgen import canvas
 #from djangocsv import render_to_csv_repsonse
 
+class NoteCategoryView(generics.CreateAPIView):
+    queryset = models.CustomUser.objects.all()
+    serializer_class = serializers.CategorySerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class NoteAddView(generics.CreateAPIView):
     queryset = models.Note.objects.all()

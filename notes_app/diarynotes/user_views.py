@@ -124,6 +124,7 @@ class PasswordResetConfirmView(APIView):
 class NotesApiView(APIView):
     def get(self, request):
         api_urls = {
+            'Create a category': 'category-add/',
             'Create a note': 'note-add/',
             'View list of notes': 'note-list/',
             'View a note': 'note-detail/<str:pk>/',

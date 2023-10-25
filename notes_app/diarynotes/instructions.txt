@@ -50,8 +50,9 @@ Installation Steps:
 
 8. List of API Endpoints:
 
-    Run http://127.0.0.1:8000/user/user-view/ to view user related
-    Run http://127.0.0.1:8000/user/notes-view/ to view notes related
+    Run "http://127.0.0.1:8000/user/user-view/" to view user endpoints
+    Run "http://127.0.0.1:8000/user/notes-view/" to view notes endpoints
+    Run "http://127.0.0.1:8000/swagger/" to view project documentation
 
 7. Access the API Endpoints:
    You can access the API endpoints using tools like [Postman](https://www.postman.com/) or [curl](https://curl.se/).
