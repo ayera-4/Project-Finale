@@ -17,6 +17,7 @@ class NoteCategoryView(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -61,7 +62,7 @@ class OverdueNotesView(generics.ListAPIView):
     #permission_class = [permissions.IsAuthenticated]
 
 class DoneNotesView(generics.ListAPIView):
-    queryset = models.Note.objects.filter(overdue=True)
+    queryset = models.Note.objects.filter(done=True)
     serializer_class = serializers.NoteSerializer
     #permission_class = [permissions.IsAuthenticated]
 
@@ -69,6 +70,25 @@ class SortedNotesView(generics.ListAPIView):
     queryset = models.Note.objects.all()
     serializer_class = serializers.NoteSerializer
     #permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        # Get sorting criteria from query parameters
+        sort_by = self.request.query_params.get('sort_by', None)
+
+        # Sort notes based on criteria
+        if sort_by == 'due_date':
+            queryset = queryset.order_by('due_date')
+        elif sort_by == 'priority':
+            queryset = queryset.order_by('priority')
+        elif sort_by == 'created_time':
+            queryset = queryset.order_by('created_time')
+        else:
+            # By default, sort by created_time
+            queryset = queryset.order_by('created_time')
+
+        return queryset
 
 
 class ExportNotesView(generics.ListAPIView):
