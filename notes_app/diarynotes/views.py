@@ -101,10 +101,10 @@ class ShareNotesView(APIView):
             message += f"Priority: {note['priority']}\n"
             message += f"Created Time: {note['created_time']}\n\n"
 
-        recipient_email = request.data.get("gumanyarevan@gmail.com")
+        recipient_email = request.data.get("recipient_email")
 
         # Send the email
-        send_mail(subject, message, 'myuo4test@gmail.com', [recipient_email])
+        send_mail(subject, message, 'myuo4anya@gmail.com', [recipient_email])
 
         return Response({"message": "Notes shared via email."})
 

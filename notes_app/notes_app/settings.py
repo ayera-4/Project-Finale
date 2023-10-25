@@ -135,11 +135,22 @@ REST_FRAMEWORK = {
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'your-stmp-server.com'
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'myuo4test@gmail.com'
+EMAIL_HOST_USER = 'myuo4anya@gmail.com'
 EMAIL_HOST_PASSWORD = '12345@user'
+EMAIL_USE_SSL = False
+
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_LOGOUT_ON_GET = True
+
+# redirect user to the LOGIN_URL after verification
+LOGIN_URL = ' http://127.0.0.1:8000/user/login/'
 
 SWAGGER_SETTINGS = {
     'DEFAULT_INFO': 'diarynotes.urls.api_info',
