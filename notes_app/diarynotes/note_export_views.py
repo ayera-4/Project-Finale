@@ -7,6 +7,7 @@ from django.http import HttpResponse
 from reportlab.pdfgen import canvas
 from openpyxl import Workbook
 
+
 class ExportCSVView(APIView):
     #permission_classes = [IsAuthenticated]
     #authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
@@ -40,6 +41,7 @@ class ExportPDFView(APIView):
         response['Content-Disposition'] = 'attachment; filename="list_of_notes.pdf"'
 
         try:
+
             # Initiate writing to list_of_notes.pdf
             notes_pdf = canvas.Canvas(response)
 
@@ -55,6 +57,13 @@ class ExportPDFView(APIView):
 
             #save pdf to response
             notes_pdf.save()
+            """
+            # Render the template with the data from the Django model
+            html_string = render_to_string('notes.html', {'objects': models.Note.objects.all()})
+
+            # Create the PDF from the HTML string
+            HTML(string=html_string).write_pdf(response)
+            """
 
         except Exception:
             return Response({'Error':'PDF file export failed'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

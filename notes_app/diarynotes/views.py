@@ -104,7 +104,7 @@ class ShareNotesView(APIView):
         recipient_email = request.data.get("recipient_email")
 
         # Send the email
-        send_mail(subject, message, 'myuo4anya@gmail.com', [recipient_email])
+        send_mail(subject, message, 'ayera4test@gmail.com', [recipient_email])
 
         return Response({"message": "Notes shared via email."})
 
@@ -139,6 +139,4 @@ class SetReminderView(APIView):
             return Response({"message": "Email reminder set."})
         except models.Note.DoesNotExist:
             return Response({"message": "Note not found."})
-
-#Ensure you replace `'your_email@example.com'` with the sender's email address. Also, make sure to provide a valid SMTP server configuration in your Django project's settings.
 
