@@ -51,7 +51,7 @@ class UserLoginView(generics.CreateAPIView):
 class UserLogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         #Get the user's token
         token = request.user.auth_token
         if token:
