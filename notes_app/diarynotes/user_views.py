@@ -1,16 +1,15 @@
-from django.shortcuts import render
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
+from rest_framework.authentication import *
 from . import serializers, models
 from django.contrib.auth import authenticate, get_user_model, update_session_auth_hash
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
-from django.utils import timezone
 
 
 class UserRegistrationView(generics.CreateAPIView):
@@ -22,6 +21,7 @@ class UserRegistrationView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 class UserLoginView(generics.CreateAPIView):
     queryset = models.CustomUser.objects.all()
@@ -49,10 +49,11 @@ class UserLoginView(generics.CreateAPIView):
 
 
 class UserLogoutView(APIView):
-    #permission_classes = [permissions.IsAuthenticated]
-    def get(self, request, *args, **kwargs):
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
+    def post(self, request, *args, **kwargs):
         #Get the user's token
-        token, _ = Token.objects.get_or_create(user=request.user)
+        token = request.user.auth_token
         if token:
             try:
                 # Expire the token
@@ -63,21 +64,7 @@ class UserLogoutView(APIView):
         return Response({'error': 'No token detected'}, status=status.HTTP_404_NOT_FOUND)
 
 
-class TokenExpirationView(APIView):
-    def get(self, request):
-        # Check if the user is authenticated and has a token
-        if request.user.is_authenticated and hasattr(request.user, 'auth_token'):
-            token = request.user.auth_token
-            current_time = timezone.now()
-            token_expires = token.created + token.settings.DEFAULT_EXPIRATION
-            token_valid = current_time <= token_expires
-
-            return Response({"valid": token_valid})
-        else:
-            return Response({"valid": False})
-
-
-class PasswordResetRequestView(APIView):
+class PasswordResetRequestView(generics.CreateAPIView):
     serializer_class = serializers.PasswordResetSerializer
 
     def create(self, request, *args, **kwargs):
@@ -85,13 +72,14 @@ class PasswordResetRequestView(APIView):
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']
         user = get_user_model().objects.filter(email=email).first()
+
         if user:
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
-            reset_link = f"https://example.com/reset-password/{uid}/{token}/"
+            reset_link = f"https://diarynotes.com/reset-password/{uid}/{token}/"
             subject = 'Password Reset Request'
             message = f'You can Reset your password by clicking this link: {reset_link}'
-            from_email = 'noreply@example.com'
+            from_email = 'ayera4test@gmail.com'
             recipient_list = [email]
 
             send_mail(subject, message, from_email, recipient_list)
@@ -133,7 +121,9 @@ class NotesApiView(APIView):
             'View latest notes': 'notes-latest/',
             'View unfinished notes': 'notes-unfinished/',
             'View overdue notes': 'notes-overdue/',
-            'View sorted notes': 'notes-sorted/',
+            'View sorted notes by due_date': 'notes-sorted/?sort_by=due_date/',
+            'View sorted notes by created_time': 'notes-sorted/?sort_by=created_time/',
+            'View sorted notes by priority': 'notes-sorted/?sort_by=priority/',
             'Share notes on email': 'notes-share/',
             'Set reminder for note': 'set-reminder/<str:note_id>/',
             'Export notes as PDF': 'export/pdf/',
@@ -151,6 +141,5 @@ class UserApiView(APIView):
             'token expiration check': 'token-expiration/',
             'password reset': 'password-reset/',
             'confirm password reset': 'password-reset/confirm/<str:uidb64>/<str:token>/',
-
         }
         return Response(api_urls)

@@ -1,4 +1,5 @@
 from rest_framework import generics, status, permissions
+from rest_framework.authentication import *
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from . import serializers, models
@@ -6,65 +7,66 @@ from . permissions import IsOwner
 from django.core.mail import send_mail
 from django.utils import timezone
 
-class NoteCategoryView(generics.CreateAPIView):
-    queryset = models.CustomUser.objects.all()
-    serializer_class = serializers.CategorySerializer
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
 class NoteAddView(generics.CreateAPIView):
     queryset = models.Note.objects.all()
     serializer_class = serializers.NoteSerializer
-    #permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
+
 
 class NoteListView(generics.ListAPIView):
     queryset = models.Note.objects.all()
     serializer_class = serializers.NoteSerializer
-    #permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
 
 class NoteDetailView(generics.RetrieveAPIView):
     queryset = models.Note.objects.all()
     serializer_class = serializers.NoteSerializer
-    #permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
 
 class NoteUpdateView(generics.UpdateAPIView):
     queryset = models.Note.objects.all()
     serializer_class = serializers.NoteSerializer
-    #permission_class = [permissions.IsAuthenticated, IsOwner]
+    permission_class = [permissions.IsAuthenticated, IsOwner]
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
 
 class NoteDeleteView(generics.DestroyAPIView):
     queryset = models.Note.objects.all()
     serializer_class = serializers.NoteSerializer
-    #permission_class = [permissions.IsAuthenticated, IsOwner]
+    permission_class = [permissions.IsAuthenticated, IsOwner]
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
 
 class LatestNotesView(generics.ListAPIView):
     queryset = models.Note.objects.all().order_by('-created_time')
     serializer_class = serializers.NoteSerializer
-    #permission_class = [permissions.IsAuthenticated]
+    permission_class = [permissions.IsAuthenticated]
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
 
 class UnfinishedNotesView(generics.ListAPIView):
-    queryset = models.Note.objects.filter(unfinished=True)
+    queryset = models.Note.objects.filter(done=False)
     serializer_class = serializers.NoteSerializer
-    #permission_class = [permissions.IsAuthenticated]
+    permission_class = [permissions.IsAuthenticated]
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
 
 class OverdueNotesView(generics.ListAPIView):
-    queryset = models.Note.objects.filter(overdue=True)
+    queryset = models.Note.objects.filter(due_date__lt=timezone.now())
     serializer_class = serializers.NoteSerializer
-    #permission_class = [permissions.IsAuthenticated]
+    permission_class = [permissions.IsAuthenticated]
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
 
 class DoneNotesView(generics.ListAPIView):
     queryset = models.Note.objects.filter(done=True)
     serializer_class = serializers.NoteSerializer
-    #permission_class = [permissions.IsAuthenticated]
+    permission_class = [permissions.IsAuthenticated]
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
 
 class SortedNotesView(generics.ListAPIView):
     queryset = models.Note.objects.all()
     serializer_class = serializers.NoteSerializer
-    #permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -84,7 +86,8 @@ class SortedNotesView(generics.ListAPIView):
 
 
 class ShareNotesView(APIView):
-    #permission_classes = [permissions.IsAuthenticated]  # Add authentication and permissions as needed
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
 
     def post(self, request):
         # Retrieve all notes
@@ -109,7 +112,8 @@ class ShareNotesView(APIView):
         return Response({"message": "Notes shared via email."})
 
 class SetReminderView(APIView):
-    #permission_classes = [permissions.IsAuthenticated]  # Add authentication and permissions as needed
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
 
     def post(self, request, note_id):
         try:
@@ -119,6 +123,7 @@ class SetReminderView(APIView):
 
             # Get the reminder time (in minutes) from the request
             reminder_minutes = request.data.get("reminder_minutes")
+            recipient_email = request.data.get("recipient_email")
 
             # Calculate the reminder time
             reminder_time = timezone.now() + timezone.timedelta(minutes=reminder_minutes)
@@ -130,13 +135,13 @@ class SetReminderView(APIView):
             message += f"Content: {note.content}\n"
             message += f"Due Date: {note.due_date}\n"
             message += f"Priority: {note.priority}\n"
-            message += f"Created Time: {note.created_time}\n\n"
+            message += f"Created Time: {note.created_time}\n"
             message += f"Reminder Time: {reminder_time}\n"
 
             # Send the email reminder
-            send_mail(subject, message, 'your_email@example.com', [request.user.email])
+            send_mail(subject, message, 'ayera4test@gmail.com', [recipient_email])
 
             return Response({"message": "Email reminder set."})
-        except models.Note.DoesNotExist:
-            return Response({"message": "Note not found."})
+        except Exception as e:
+            return Response({"message": str(e)})
 

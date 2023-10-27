@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from model_utils import Choices
 
 # Create your models here.
 class CustomUser(AbstractUser):
@@ -12,17 +13,15 @@ class CustomUser(AbstractUser):
     #USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["email", "first_name", "last_name"]
 
-class Category(models.Model):
-    name = models.CharField(max_length=255)
-
 class Note(models.Model):
+    CATEGORY = Choices("Operations", "Finance", "Marketing", "People")
+    PRIORITY = Choices("High", "Moderate", "Low")
     title = models.CharField(max_length=255)
     content = models.TextField()
-    due_date = models.DateTimeField()
-    unfinished = models.BooleanField()
+    due_date = models.DateTimeField(blank=True, null=True)
     done = models.BooleanField()
-    overdue = models.BooleanField()
-    priority = models.CharField(max_length=20)
+    priority = models.CharField(max_length=20, choices=PRIORITY)
+    category = models.CharField(max_length=255, choices=CATEGORY)
     created_time = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+

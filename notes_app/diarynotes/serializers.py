@@ -1,10 +1,10 @@
 from rest_framework import serializers
-from .models import Note, Category, CustomUser
+from .models import Note, CustomUser
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'first_name', 'last_name', 'password']
+        fields = ['email', 'first_name', 'last_name', 'password']
         extra_kwargs = {'password': {'write_only': True}}
 
 class UserLoginSerializer(serializers.ModelSerializer):
@@ -24,9 +24,4 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
-        fields = '__all__'
-
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = '__all__'
+        fields = ['category','title', 'content', 'priority', 'due_date', 'done']

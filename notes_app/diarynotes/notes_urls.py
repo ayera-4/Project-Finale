@@ -2,7 +2,6 @@ from django.urls import path
 from . import views, note_export_views
 
 urlpatterns = [
-    path('category-add/', views.NoteCategoryView.as_view(), name='category-add'),
     path('note-add/', views.NoteAddView.as_view(), name='note-add'),
     path('note-list/', views.NoteListView.as_view(), name='note-list'),
     path('note-detail/<str:pk>/', views.NoteDetailView.as_view(), name='note-detail'),
@@ -12,7 +11,9 @@ urlpatterns = [
     path('notes-unfinished/', views.UnfinishedNotesView.as_view(), name='notes-unfinished'),
     path('notes-overdue/', views.OverdueNotesView.as_view(), name='notes-overdue'),
     path('notes-done/', views.DoneNotesView.as_view(), name='notes-done'),
-    path('notes-sorted/', views.SortedNotesView.as_view(), name='notes-sorted'),
+    path('notes-sorted/?sort_by=due_date/', views.SortedNotesView.as_view(), name='sort_by_due_date'),
+    path('notes-sorted/?sort_by=priority/', views.SortedNotesView.as_view(), name='sort_by_priority'),
+    path('notes-sorted/?sort_by=created_time/', views.SortedNotesView.as_view(), name='sort_by_creation'),
     path('export/pdf/', note_export_views.ExportPDFView.as_view(), name='export-notes-pdf'),
     path('export/csv/', note_export_views.ExportCSVView.as_view(), name='export-notes-csv'),
     path('export/excel/', note_export_views.ExportExcelView.as_view(), name='export-notes-excel'),

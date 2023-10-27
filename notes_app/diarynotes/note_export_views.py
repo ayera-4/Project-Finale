@@ -1,4 +1,3 @@
-from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from . import serializers, models
@@ -6,11 +5,13 @@ import csv
 from django.http import HttpResponse
 from reportlab.pdfgen import canvas
 from openpyxl import Workbook
+from rest_framework.authentication import *
+from rest_framework import status, permissions
 
 
 class ExportCSVView(APIView):
-    #permission_classes = [IsAuthenticated]
-    #authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
     def get(self, request):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="list_of_notes.csv"'
@@ -34,8 +35,8 @@ class ExportCSVView(APIView):
 
 
 class ExportPDFView(APIView):
-    #permission_classes = [IsAuthenticated]
-    #authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
     def get(self, request):
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="list_of_notes.pdf"'
@@ -57,13 +58,6 @@ class ExportPDFView(APIView):
 
             #save pdf to response
             notes_pdf.save()
-            """
-            # Render the template with the data from the Django model
-            html_string = render_to_string('notes.html', {'objects': models.Note.objects.all()})
-
-            # Create the PDF from the HTML string
-            HTML(string=html_string).write_pdf(response)
-            """
 
         except Exception:
             return Response({'Error':'PDF file export failed'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -72,8 +66,8 @@ class ExportPDFView(APIView):
 
 
 class ExportExcelView(APIView):
-    #permission_classes = [IsAuthenticated]
-    #authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
 
     def get(self, request):
         try:
