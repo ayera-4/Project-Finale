@@ -21,7 +21,7 @@ Installation Steps:
    pip install -r requirements.txt
 
 4. Database Setup:
-   - Create a PostgreSQL database and configure the database settings in the `settings.py` file.
+   - Create a MySQL database and configure the database settings in the `settings.py` file.
    - Apply the initial database migrations:
 
      python manage.py makemigrations
@@ -54,9 +54,12 @@ Installation Steps:
     Run "http://127.0.0.1:8000/user/notes-view/" to view notes endpoints
     Run "http://127.0.0.1:8000/swagger/" to view project documentation
 
-7. Access the API Endpoints:
+9. Access the API Endpoints:
    You can access the API endpoints using tools like [Postman](https://www.postman.com/) or [curl](https://curl.se/).
    Ensure you include authentication tokens or credentials when making requests to protected endpoints.
+
+10. Running the test cases
+    Run "python manage.py test"
 
 Note:
 Ensure that you have a valid email configuration set up in your Django project settings

@@ -1,19 +1,22 @@
-from django.contrib.auth.models import User
+#from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from rest_framework import status
-from .models import Note
+from .models import Note, CustomUser
 from django.utils import timezone
-from PyPDF2 import PdfFileReader
+from PyPDF2 import PdfReader
 from openpyxl import load_workbook
 import io
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 
 class DiaryNotesAPITestCase(APITestCase):
 
     def setUp(self):
         # Create a test user
-        self.user = User.objects.create_user(email='tungauser@example.com', password='tungapass')
+        self.user = CustomUser.objects.create_user(username='tungauser', email='tungauser@example.com', password='tungapass')
         self.token = Token.objects.create(user=self.user)
+        self.uidb64 = urlsafe_base64_encode(force_bytes(self.user.pk))
 
     """
     Below are test cases for the user related views
@@ -262,7 +265,7 @@ class DiaryNotesAPITestCase(APITestCase):
 
         # Check if the response contains a valid PDF.
         try:
-            pdf = PdfFileReader(response.content)
+            pdf = PdfReader(response.content)
             # Check if the PDF has at least one page (your notes)
             self.assertGreaterEqual(pdf.getNumPages(), 1)
         except Exception as e:
